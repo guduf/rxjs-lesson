@@ -73,11 +73,16 @@ export class BasicDemoComponent {
 
   private _actionWithObservableFromPromise(): Observable<boolean> {
     this._append('start', 'observable from promise');
-    return from(this._actionWithPromise()).pipe(tap(() => this._append('end', 'observable from promise')))
+    return from(this._actionWithPromise()).pipe(
+      tap(() => this._append('end', 'observable from promise'))
+    )
   }
 
   private _actionWithObservable(): Observable<boolean> {
     this._append('start', 'observable');
-    return of(true).pipe(delay(1000), tap(() => this._append('end', 'observable')))
+    return of(true).pipe(
+      delay(1000),
+      tap(() => this._append('end', 'observable'))
+    )
   }
 }

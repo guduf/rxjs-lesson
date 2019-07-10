@@ -12,5 +12,8 @@ import { routes } from './routes';
   `
 })
 export class AppComponent  {
-  links = routes.reduce((acc, route) => [...acc, ...(route.path ? [route.path] : [])], [])
+  links = routes.reduce((acc, route) => [
+    ...acc,
+    ...(route.path ? [route.path] : [])
+  ], [])
 }

@@ -70,8 +70,7 @@ export class TypeDemoComponent implements OnDestroy {
     }
     this.result = [];
     this._subscr = from(INITIAL_BASKET).pipe(
-      mergeMap((_, i) => of({fruit: INITIAL_BASKET[i]}).pipe(delay((i + 1) * 1000))),
-      take(INITIAL_BASKET.length)
+      mergeMap((_, i) => of({fruit: INITIAL_BASKET[i]}).pipe(delay((i + 1) * 1000)))
     ).subscribe(this.observer)
   }
 

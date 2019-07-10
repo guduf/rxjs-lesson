@@ -26,14 +26,15 @@ import {
   tap
 } from 'rxjs/operators'
 
-type StockItem = '🌾' | '🍇' | '🍎' | '🍋' | '🥃'
-type Stock = { [item in StockItem]?: number }
-const STOCK_ITEMS: StockItem[] = ['🌾', '🍇', '🍎', '🍋', '🥃']
 const PURCHASE_DELAY = 5 * 1000
 const ORDER_DELAY = 2.5 * 1000
 
+type StockItem = '🌾' | '🍇' | '🍎' | '🍋' | '🥃'
+type Stock = { [item in StockItem]: number }
+const STOCK_ITEMS: StockItem[] = ['🌾', '🍇', '🍎', '🍋', '🥃']
+
 type Beverage = '🍺' | '🍹' | '🍷' | '🥤'
-const BEVERAGES: { [b in Beverage]: Stock } = {
+const BEVERAGES: { [b in Beverage]: Partial<Stock> } = {
   '🍺' : {'🌾': 2},
   '🍹': {'🥃': 1, '🍋': 1},
   '🍷' : {'🍇': 1},
@@ -107,7 +108,9 @@ export class MixologyDemoComponent {
     ))
   )
 
-  readonly stock = new BehaviorSubject<Stock>({})
+  readonly stock = new BehaviorSubject(
+    STOCK_ITEMS.reduce((acc, item) => ({...acc, [item]: 0}), {} as Stock)
+  )
 
   readonly purchasesSubscr = combineLatest(this.purchaseTimer, this.nextStock).pipe(
     distinctUntilKeyChanged('0'),
