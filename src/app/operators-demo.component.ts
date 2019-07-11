@@ -42,7 +42,7 @@ const BEVERAGES: { [b in Beverage]: Partial<Stock> } = {
 }
 
 @Component({
-  selector: 'app-mixology-demo',
+  selector: 'app-operators-demo',
   template: `
     <p>Purchases:</p>
     <button type="button" *ngFor="let item of stockItems" (click)="purchases.next(item)">
@@ -65,7 +65,7 @@ const BEVERAGES: { [b in Beverage]: Partial<Stock> } = {
     </div>
   `
 })
-export class MixologyDemoComponent {
+export class OperatorsDemoComponent {
   readonly stockItems = STOCK_ITEMS
 
   readonly bevegages = Object.keys(BEVERAGES) as Beverage[]
