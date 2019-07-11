@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core'
-import { from, Observable } from 'rxjs'
+import { from, Observable, Subscription, Subject } from 'rxjs'
 import { map, mergeMap, scan, startWith, tap } from 'rxjs/operators'
 import faker from 'faker'
 
@@ -172,32 +172,33 @@ export class ZooNurse extends Observable<Animal> {
         </li>
       </ul>
     </div>
-    <div style="float: left; margin-left: 40px">
-      <p>Nurses</p>
-      <ul>
-        <li *ngFor="let pair of nursesLastBaby | async | keyvalue">
-        {{pair.key}}: {{pair.value ? getAnimalLabel(pair.value) : 'none'}}
-        </li>
-      </ul>
+    <div *ngIf="nurse | async as lastBaby" style="float: left; margin-left: 40px">
+      <p>Nurse</p>
+      <p>{{nurse.name || 'UNKNOWN'}}'s last baby: {{getAnimalLabel(lastBaby)}}</p>
     </div>
   `
 })
 export class HotNColdDemoComponent {
   readonly zoo = new Zoo()
+
   readonly keepers = Array.from({length: 10}, () => new ZooKeeper(this.zoo))
+
   readonly keepersTarget = from(this.keepers).pipe(
     mergeMap((keeper: ZooKeeper) => keeper.pipe(startWith(null), map(target => ({[keeper.name]: target})))),
     scan((acc, pair) => ({...acc, ...pair}), {} as { [name: string]: Animal }),
     map(e => ({...e}))
   )
-  readonly nurses = Array.from({length: 3}, () => new ZooNurse(this.zoo))
-  readonly nursesLastBaby = from(this.nurses).pipe(
-    mergeMap((nurse: ZooNurse) => nurse.pipe(startWith(null), map(target => ({[nurse.name]: target})))),
-    scan((acc, pair) => ({...acc, ...pair}), {} as { [name: string]: Animal }),
-    map(e => ({...e}))
-  )
+
+  readonly nurse =  new ZooNurse(this.zoo)
+
+  private _subscr: Subscription;
+
+  ngOnInit() {
+    // this._subscr = this.nurse.subscribe(e => console.log)
+  }
 
   ngOnDestroy() {
+    if (this._subscr) this._subscr.unsubscribe()
     this.zoo.repairFences()
   }
 
@@ -206,10 +207,16 @@ export class HotNColdDemoComponent {
   }
 }
 
+function makeHot<T>(cold: Observable<T>): Observable<T> {
+  const subject = new Subject<T>();
+  cold.subscribe(subject);
+  return new Observable((observer) => subject.subscribe(observer));
+}
+
 function shuffle<T>(a: T[]): T[] {
   for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
